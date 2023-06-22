@@ -10,8 +10,9 @@ typedef enum {
   BUTTON_RAISING
 } debounceState_t;
 
-debounceState_t s;  //s refers to the current state
+debounceState_t state;  //state refers to the current state
 
+bool on = HIGH;  //The variable on sets the state of the output LED that switches states
 
 void debounceFSM_init(void);
 void debounceFSM_update(void);
@@ -30,16 +31,16 @@ void loop() {
 }
 
 void debounceFSM_init(void) {
-  s = BUTTON_UP;
+  state = BUTTON_UP;
 }
 
 void debounceFSM_update(void) {
   static unsigned long last = millis();
  
-  switch (s) {
+  switch (state) {
     case BUTTON_UP:
       if (!digitalRead(BUTTON)){
-        s = BUTTON_FALLING;
+        state = BUTTON_FALLING;
         last = millis();
       }
       break;
@@ -48,14 +49,14 @@ void debounceFSM_update(void) {
       if (millis() - last >= DELAY) {
         if (!digitalRead(BUTTON)){
           pressed();
-          s = BUTTON_DOWN;
-        }else s = BUTTON_UP;
+          state = BUTTON_DOWN;
+        }else state = BUTTON_UP;
       }
       break;
 
     case BUTTON_DOWN:
       if (digitalRead(BUTTON)) {
-        s = BUTTON_RAISING;
+        state = BUTTON_RAISING;
         last = millis();
       }
       break;
@@ -64,8 +65,8 @@ void debounceFSM_update(void) {
       if (millis() - last >= DELAY) {
         if (digitalRead(BUTTON)) {
           released();
-          s = BUTTON_UP;
-        } else s = BUTTON_DOWN;
+          state = BUTTON_UP;
+        } else state = BUTTON_DOWN;
       }
       break;
 
@@ -77,10 +78,10 @@ void debounceFSM_update(void) {
 
 void pressed(void) {
   digitalWrite(LED, HIGH);
-  digitalWrite(LED2, LOW);
+  digitalWrite(LED2, on);
+  on = !on;
 }
 
 void released(void) {
   digitalWrite(LED, LOW);
-  digitalWrite(LED2, HIGH);
 }
