@@ -1,38 +1,39 @@
-#define DELAY 40
-#define LED 13
-#define BUTTON 2
+#define DELAY 40  //The default delay to check for a bounce is of 40 milliseconds
+#define LED 6   //The first LED is on the digital pin n. 6
+#define LED2 5 //The second LED is on the digital pin n. 5
+#define BUTTON 7  //The measure of the button's state is on digital pin n. 7
 
 typedef enum {
   BUTTON_UP,
   BUTTON_FALLING,
   BUTTON_DOWN,
   BUTTON_RAISING
-} S;
+} debounceState_t;
 
-S s;
+debounceState_t s;  //s refers to the current state
 
 
 void debounceFSM_init(void);
 void debounceFSM_update(void);
 
-void buttonPressed(void);
-void buttonReleased(void);
+void pressed(void);
+void released(void);
 
 void setup() {
   pinMode(LED, OUTPUT);
   pinMode(BUTTON, INPUT);
-  button_init();
+  debounceFSM_init();
 }
 
 void loop() {
-  button_update();
+  debounceFSM_update();
 }
 
-void button_init(void) {
+void debounceFSM_init(void) {
   s = BUTTON_UP;
 }
 
-void button_update(void) {
+void debounceFSM_update(void) {
   static unsigned long last = millis();
  
   switch (s) {
@@ -46,7 +47,7 @@ void button_update(void) {
     case BUTTON_FALLING:
       if (millis() - last >= DELAY) {
         if (!digitalRead(BUTTON)){
-          buttonPressed();
+          pressed();
           s = BUTTON_DOWN;
         }else s = BUTTON_UP;
       }
@@ -62,22 +63,24 @@ void button_update(void) {
     case BUTTON_RAISING:
       if (millis() - last >= DELAY) {
         if (digitalRead(BUTTON)) {
-          buttonReleased();
+          released();
           s = BUTTON_UP;
         } else s = BUTTON_DOWN;
       }
       break;
 
     default:
-      buttonReleased();
+      released();
       break;
   }
 }
 
-void buttonPressed(void) {
+void pressed(void) {
   digitalWrite(LED, HIGH);
+  digitalWrite(LED2, LOW);
 }
 
-void buttonReleased(void) {
+void released(void) {
   digitalWrite(LED, LOW);
+  digitalWrite(LED2, HIGH);
 }
