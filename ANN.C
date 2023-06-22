@@ -3,14 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-// We define some constants of mi algorithm
+// We define some constants of the algorithm
 #define m 10       // Number of training examples
-#define n_x 2      // Number of features
+#define n_x 2      // Number of features in each example
 #define alpha 0.001 // Learning rate
-#define RATE_CHANGE 0.00001
 #define EPOCHS 1000001 // Training epochs
 
-// Definimos la estructura de la neurona
+// We define the structure of a layer
 typedef struct {
   // Parameters
   float **W;
